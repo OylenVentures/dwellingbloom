@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, Star, ShieldCheck, Zap, Heart } from "lucide-react";
-import ListingCard from "./ListingCard";
+import ListingCard from "./features/ListingCard";
 import { Listing } from "../store/useRealEstateStore";
 import Image from "next/image";
 

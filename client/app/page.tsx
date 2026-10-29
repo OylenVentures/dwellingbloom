@@ -1,7 +1,13 @@
-'use client';
-
-import App from './App';
+import Hero from "./components/features/Hero";
+import Listing from "./components/features/Listing";
+import Trust from "./components/features/Trust";
 
 export default function Home() {
-  return <App />;
+  return (
+    <main>
+      <Hero />
+      <Trust />
+      <Listing />
+    </main>
+  );
 }

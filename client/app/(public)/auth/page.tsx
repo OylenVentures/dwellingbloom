@@ -1,0 +1,410 @@
+"use client";
+
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "../../store/useAuthStore";
+import {
+  login,
+  signup,
+  type LoginResponse,
+  type SignupResponse,
+} from "../../api/auth";
+import { getCurrentUser } from "../../api/user";
+import { Mail, Lock, Phone, ShieldCheck } from "lucide-react";
+import type { AuthFormData } from "@/app/common/validator";
+import { AuthPageProps } from "@/app/common/interface";
+import { getErrorMessage } from "@/app/common/helper";
+
+export default function AuthPage({ mode = "login" }: AuthPageProps) {
+  const router = useRouter();
+  const setUser = useAuthStore((state) => state.setUser);
+
+  const onNavigateToLogin = () => router.push("/auth/login");
+  const onNavigateToRegister = () => router.push("/auth/register");
+  const onNavigateToVerify = (email: string) =>
+    router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+  const onNavigateToDashboard = () => router.push("/dashboard");
+  const onNavigateToForgot = () => router.push("/auth/reset-password");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<AuthFormData>({
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      password: "",
+      confirm_password: "",
+      phone_number: "",
+      bvn: "",
+      account_number: "",
+      account_name: "",
+      bank_name: "",
+      role: "TENANT" as "TENANT" | "OWNER",
+    },
+  });
+
+  const onSubmit = async (data: AuthFormData) => {
+    try {
+      const resData =
+        mode === "login"
+          ? await login({ email: data.email, password: data.password })
+          : await signup(data);
+
+      if (mode === "login") {
+        const loginData = resData as LoginResponse;
+        const currentUser = await getCurrentUser(loginData.access_token);
+        localStorage.setItem("token", loginData.access_token);
+        setUser(
+          currentUser.data,
+          loginData.access_token,
+          loginData.refresh_token,
+        );
+        toast.success(
+          loginData.message || "Login successful. Loading your dashboard...",
+          { icon: "👋" },
+        );
+        onNavigateToDashboard();
+      } else {
+        const signupData = resData as SignupResponse;
+        toast.success(
+          signupData.message ||
+            "Registration successful! Please verify your email.",
+        );
+        onNavigateToVerify(data.email);
+      }
+    } catch (error: unknown) {
+      if (
+        mode === "login" &&
+        error === "Error: Account not verified, please check your email."
+      ) {
+        onNavigateToVerify(data.email);
+      }
+
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="max-w-xl w-full bg-white border border-border p-8 rounded-3xl shadow-xl space-y-6">
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-primary tracking-tight">
+            {mode === "login" ? "Welcome Back" : "Create Account"}
+          </h2>
+          <p className="text-text-secondary text-sm mt-1">
+            {mode === "login"
+              ? "Sign in to access your DwellingBloom account."
+              : "Join as a renter or homeowner to get started."}
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {mode === "register" && (
+            <>
+              <div className="grid grid-cols-2 gap-3 mb-2">
+                <label className="flex items-center justify-center p-3 border rounded-xl cursor-pointer hover:bg-background transition-colors [&:has(input:checked)]:border-primary [&:has(input:checked)]:bg-primary/5">
+                  <input
+                    type="radio"
+                    value="TENANT"
+                    {...register("role")}
+                    className="sr-only"
+                    defaultChecked
+                  />
+                  <span className="text-sm font-semibold text-text-primary">
+                    I want to Rent
+                  </span>
+                </label>
+                <label className="flex items-center justify-center p-3 border rounded-xl cursor-pointer hover:bg-background transition-colors [&:has(input:checked)]:border-primary [&:has(input:checked)]:bg-primary/5">
+                  <input
+                    type="radio"
+                    value="OWNER"
+                    {...register("role")}
+                    className="sr-only"
+                  />
+                  <span className="text-sm font-semibold text-text-primary">
+                    I own Property
+                  </span>
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-text-primary mb-1">
+                    First Name*
+                  </label>
+                  <input
+                    type="text"
+                    {...register("first_name", { required: "Required" })}
+                    className="w-full px-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                  />
+                  {errors.first_name && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.first_name.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-text-primary mb-1">
+                    Last Name*
+                  </label>
+                  <input
+                    type="text"
+                    {...register("last_name", { required: "Required" })}
+                    className="w-full px-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                  />
+                  {errors.last_name && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.last_name.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-xs font-semibold text-text-primary mb-1"
+            >
+              Email Address*
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+              <input
+                id="email"
+                type="email"
+                {...register("email", { required: "Required" })}
+                className="w-full pl-10 pr-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                placeholder="name@example.com"
+              />
+              {errors.email && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label
+                htmlFor="password"
+                className="block text-xs font-semibold text-text-primary"
+              >
+                Password*
+              </label>
+              {mode === "login" && (
+                <button
+                  type="button"
+                  onClick={onNavigateToForgot}
+                  className="cursor-pointer text-xs text-primary font-semibold hover:underline"
+                >
+                  Forgot Password?
+                </button>
+              )}
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+              <input
+                id="password"
+                type="password"
+                {...register("password", { required: "Required" })}
+                className="w-full pl-10 pr-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                placeholder="••••••••"
+              />
+              {errors.password && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {mode === "register" && (
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label
+                  htmlFor="confirm_password"
+                  className="block text-xs font-semibold text-text-primary"
+                >
+                  Confirm Password*
+                </label>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                <input
+                  id="confirm_password"
+                  type="password"
+                  {...register("confirm_password", { required: "Required" })}
+                  className="w-full pl-10 pr-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                  placeholder="••••••••"
+                />
+                {errors.confirm_password && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.confirm_password.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {mode === "register" && (
+            <>
+              <div>
+                <label
+                  htmlFor="phone_number"
+                  className="block text-xs font-semibold text-text-primary mb-1"
+                >
+                  Phone Number*
+                </label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                  <input
+                    id="phone_number"
+                    type="tel"
+                    {...register("phone_number", { required: "Required" })}
+                    className="w-full pl-10 pr-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                    placeholder="e.g. 08012345678"
+                  />
+                  {errors.phone_number && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.phone_number.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="border-t border-border pt-4 mt-2">
+                <h3 className="text-xs font-bold text-secondary uppercase tracking-wider mb-3 flex items-center gap-1">
+                  <ShieldCheck className="w-4 h-4 text-accent" />
+                  <span>Identity & Financial Details</span>
+                </h3>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="bvn"
+                      className="block text-xs font-semibold text-text-primary mb-1"
+                    >
+                      BVN (Bank Verification Number)*
+                    </label>
+                    <input
+                      id="bvn"
+                      type="text"
+                      maxLength={11}
+                      {...register("bvn", { required: "Required" })}
+                      className="w-full px-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                      placeholder="11-digit BVN"
+                    />
+                    {errors.bvn && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.bvn.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="bank_name"
+                      className="block text-xs font-semibold text-text-primary mb-1"
+                    >
+                      Bank Name*
+                    </label>
+                    <input
+                      id="bank_name"
+                      type="text"
+                      {...register("bank_name", { required: "Required" })}
+                      className="w-full px-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                      placeholder="e.g. GTBank"
+                    />
+                    {errors.bank_name && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.bank_name.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="account_number"
+                      className="block text-xs font-semibold text-text-primary mb-1"
+                    >
+                      Account Number*
+                    </label>
+                    <input
+                      id="account_number"
+                      type="text"
+                      maxLength={10}
+                      {...register("account_number", { required: "Required" })}
+                      className="w-full px-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                      placeholder="10-digit Account No."
+                    />
+                    {errors.account_number && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.account_number.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="account_name"
+                      className="block text-xs font-semibold text-text-primary mb-1"
+                    >
+                      Account Name*
+                    </label>
+                    <input
+                      id="account_name"
+                      type="text"
+                      {...register("account_name", { required: "Required" })}
+                      className="w-full px-4 py-2 border border-border rounded-xl text-sm focus:outline-hidden"
+                      placeholder="Holder Name"
+                    />
+                    {errors.account_name && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.account_name.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="cursor-pointer w-full py-3 mt-4 bg-primary hover:bg-secondary text-white font-semibold rounded-xl text-sm transition-colors shadow-xs disabled:cursor-not-allowed disabled:bg-primary/50"
+          >
+            {isSubmitting
+              ? "Processing..."
+              : mode === "login"
+                ? "Login"
+                : "Create Account"}
+          </button>
+        </form>
+
+        <div className="text-center pt-2 border-t border-border">
+          <p className="text-text-secondary text-xs">
+            {mode === "login"
+              ? "Don't have an account?"
+              : "Already registered?"}
+            <button
+              onClick={
+                mode === "login" ? onNavigateToRegister : onNavigateToLogin
+              }
+              className="cursor-pointer text-primary font-bold ml-1 hover:underline text-xs"
+            >
+              {mode === "login" ? "Register here" : "Sign in here"}
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
