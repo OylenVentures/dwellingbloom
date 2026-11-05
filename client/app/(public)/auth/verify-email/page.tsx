@@ -6,10 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { ShieldCheck, ArrowRight } from "lucide-react";
 import { resendActivation, verifyEmail } from "../../../api/auth";
-
-function getErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : "Something went wrong";
-}
+import { getErrorMessage } from "@/app/common/helper";
+import { FormBtn } from "@/app/components/ui/Btn";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -54,13 +52,12 @@ export default function VerifyEmailPage() {
           <h2 className="text-2xl font-extrabold text-primary tracking-tight">
             Verify Your Email
           </h2>
-          <p className="text-text-secondary text-sm mt-2 leading-relaxed">
-            We&apos;ve sent a verification code to{" "}
-            <span className="font-bold text-text-primary">{email}</span>.
-          </p>
-          {/* <p className="text-[11px] text-accent font-semibold mt-1 bg-accent/5 py-1 px-2 rounded-lg inline-block">
-            For testing, enter code: <span className="font-mono">z4hvh6sz9MxqlqGgssBO4VTNp961xjkZ</span>
-          </p> */}
+          {email && (
+            <p className="text-text-secondary text-sm mt-2 leading-relaxed">
+              We&apos;ve sent a verification code to{" "}
+              <span className="font-bold text-text-primary">{email}</span>.
+            </p>
+          )}
         </div>
 
         <form onSubmit={handleVerify} className="space-y-4">
@@ -75,37 +72,41 @@ export default function VerifyEmailPage() {
             />
           </div>
 
-          <button
+          <FormBtn
             type="submit"
             disabled={loading}
-            className="cursor-pointer w-full py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
-          >
-            <span>{loading ? "Verifying..." : "Verify Code"}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+            styling="cursor-pointer w-full py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:bg-primary/50"
+            text={loading ? "Verifying..." : "Verify Code"}
+            icon={<ArrowRight className="w-4 h-4" />}
+          />
         </form>
 
-        <div className="text-xs text-text-secondary">
-          Didn&apos;t receive code?{" "}
-          <button
-            type="button"
-            onClick={async () => {
-              try {
-                const resp = await resendActivation({ email });
-                toast.success(resp.message || "Verification email resent");
-              } catch (error: unknown) {
-                console.error("Error resending verification email:", error);
-                toast.error(
-                  getErrorMessage(error) ||
-                    "Unable to resend verification email",
-                );
-              }
-            }}
-            className="cursor-pointer text-primary font-bold hover:underline"
-          >
-            Resend Email
-          </button>
-        </div>
+        {email && (
+          <div className="text-xs text-text-secondary">
+            Didn&apos;t receive code?{" "}
+            <button
+              type="button"
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const resp = await resendActivation({ email });
+                  toast.success(resp.message || "Verification email resent");
+                } catch (error: unknown) {
+                  toast.error(
+                    getErrorMessage(error) ||
+                      "Unable to resend verification email",
+                  );
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="cursor-pointer text-primary font-bold hover:underline disabled:cursor-not-allowed disabled:bg-primary/50"
+            >
+              Resend Email
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

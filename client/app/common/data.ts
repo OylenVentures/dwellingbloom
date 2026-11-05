@@ -1,4 +1,7 @@
 export const NAV_LINKS = [
   { name: "Home", href: "/" },
-  { name: "All Dwellings", href: "/property" },
+  { name: "Explore Listings", href: "/explore" },
+  // { name: "For Homeowners", href: "/property" },
+  // { name: "For Renters", href: "/property" },
+  // { name: "Community", href: "/property" },
 ];

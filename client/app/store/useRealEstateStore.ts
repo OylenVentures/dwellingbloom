@@ -1,5 +1,3 @@
-"use client";
-
 import { create } from "zustand";
 import {
   createApartment,
@@ -11,8 +9,10 @@ export type Listing = Apartment;
 
 interface RealEstateStore {
   listings: Listing[];
-  loading: boolean;
+  filters: string;
+  isLoading: boolean;
   error: string | null;
+  setFilters: (filters: string) => void;
   fetchListings: () => Promise<void>;
   addListing: (listing: FormData) => Promise<Listing | null>;
 }
@@ -23,28 +23,30 @@ function getErrorMessage(error: unknown) {
 
 export const useRealEstateStore = create<RealEstateStore>((set) => ({
   listings: [],
-  loading: false,
+  filters: "",
+  isLoading: false,
   error: null,
+  setFilters: (newFilters) => set({ filters: newFilters }),
   fetchListings: async () => {
-    set({ loading: true, error: null });
+    set({ isLoading: true, error: null });
     try {
       const resp = await listApartments();
-      set({ listings: resp.data, loading: false });
+      set({ listings: resp.data, isLoading: false });
     } catch (error: unknown) {
-      set({ error: getErrorMessage(error), loading: false });
+      set({ error: getErrorMessage(error), isLoading: false });
     }
   },
   addListing: async (newListing) => {
-    set({ loading: true, error: null });
+    set({ isLoading: true, error: null });
     try {
       const created = await createApartment(newListing);
       set((state) => ({
         listings: [created, ...state.listings],
-        loading: false,
+        isLoading: false,
       }));
       return created;
     } catch (error: unknown) {
-      set({ error: getErrorMessage(error), loading: false });
+      set({ error: getErrorMessage(error), isLoading: false });
       return null;
     }
   },

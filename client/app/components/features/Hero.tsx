@@ -1,65 +1,101 @@
-import { ArrowRight, Star } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 import Image from "next/image";
-import LinkBtn from "../ui/Btn";
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden bg-white border-b border-border py-20 lg:py-32">
-      <div className="absolute inset-0 bg-linear-to-tr from-background to-white pointer-events-none opacity-50" />
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column */}
-          <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-semibold uppercase tracking-wider">
-              <Star className="w-3.5 h-3.5 fill-current" />
-              <span>Next-Gen Rental Network</span>
+    <section className="relative w-full overflow-hidden bg-linear-to-b from-surface-container-lowest via-surface to-surface-container-low pb-space-xl">
+      <div className="max-w-360 mx-auto px-gutter-lg pt-space-xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-center mb-space-xl">
+          <div className="lg:col-span-7 flex flex-col gap-space-md">
+            <div className="inline-flex items-center gap-space-xs px-space-sm py-space-xs bg-surface-container-high rounded-full w-fit">
+              <span className="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse" />
+              <span className="font-label-caps text-label-caps text-secondary uppercase tracking-widest">
+                Architectural Clarity • Direct Verified Leasing
+              </span>
             </div>
-            <h1 className="text-4xl sm:text-6xl font-black text-primary tracking-tight leading-tight">
-              Find Your Perfect <span className="text-secondary">Dwelling</span>
-              , Made Simple.
+            <h1 className="font-display-hero text-display-hero text-primary tracking-tight max-w-2xl">
+              Where Finding a Home Feels Like Coming Home
             </h1>
-            <p className="text-text-secondary text-lg sm:text-xl max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
-              DwellingBloom connects verified tenants directly with homeowners.
-              No middlemen, transparent pricing, secure agreements, and zero
-              hassle.
+            <p className="font-body-xl text-body-xl text-on-surface-variant max-w-xl font-light">
+              DwellingBloom connects quality homeowners directly with verified
+              tenants. Zero friction, transparent escrow, and seamless
+              communication.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
-              <LinkBtn
-                href="/property"
-                styling="flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-secondary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all duration-200 cursor-pointer"
-                icon={<ArrowRight className="w-4 h-4" />}
-                text="Explore Listings"
-              />
-              <LinkBtn
-                href="/auth/register"
-                styling="flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-background text-text-primary border border-border font-bold rounded-2xl transition-all duration-200"
-                text="Get Started"
-              />
-            </div>
           </div>
 
-          {/* Right Column (Hero Graphic) */}
           <div className="lg:col-span-5 relative">
-            <div className="aspect-square max-w-112.5 mx-auto rounded-3xl overflow-hidden shadow-2xl border-4 border-white relative group">
+            <div className="relative rounded-xl overflow-hidden shadow-xl aspect-4/3 bg-surface-container">
               <Image
-                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
-                loading="eager"
-                width={800}
-                height={800}
-                alt="Modern House exterior"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8dI0a_2JtcmRAek5Fzrl4R7P1VAOwuZl_7kIJoO9qMCkxWo3qBsoqAVpaBHvSOmJWCIVaaBpMI4ae10AQC1nelXa3TYFHYuY9vTUNcv4pEY5zKGOI0cZzrxAxk57GZP7y9tcamKMYeFopHowcE3_ndddpvRQbUGkb9LGeinbPiUrGIDpG1N4C04p1yaoQ9ONXGWfaYPV2JJZFpA7iEh4br2XGQsGi6gLqyJqV2JJ7"
+                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
+                width={300}
+                height={300}
+                alt="Modern architectural interior"
               />
-              <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-border shadow-lg flex items-center justify-between">
-                <div>
-                  <span className="text-xs text-text-secondary font-bold uppercase tracking-wider block">
-                    Featured Dwelling
-                  </span>
-                  <span className="text-lg font-extrabold text-primary">
-                    Luxury Glasshouse
-                  </span>
+              <div className="absolute inset-0 bg-linear-to-t from-primary/60 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 bg-surface-container-lowest/90 backdrop-blur-md p-space-md rounded-lg shadow-md flex items-center justify-between">
+                <div className="flex items-center gap-space-sm">
+                  <BadgeCheck className="w-5 h-5 text-on-tertiary-container fill-on-tertiary-container" />
+                  <div>
+                    <div className="font-label-md text-label-md text-primary">
+                      Ketu • Lagos
+                    </div>
+                    <div className="font-body-sm text-body-sm text-secondary">
+                      Pre-screened &amp; Leased in 18 hrs
+                    </div>
+                  </div>
                 </div>
-                <span className="text-md font-bold text-accent">$3,200/mo</span>
+                <span className="font-numeric-data text-numeric-data text-primary font-bold bg-surface-container-high px-space-sm py-1 rounded">
+                  Direct Escrow
+                </span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter mt-space-xl pt-space-lg">
+          <div className="flex flex-col gap-1 p-space-md bg-surface-container-lowest/60 backdrop-blur-sm rounded-lg shadow-sm">
+            <div className="font-headline-lg text-headline-lg text-primary tracking-tight">
+              14,000+
+            </div>
+            <div className="font-label-caps text-label-caps text-secondary uppercase">
+              Verified Homes
+            </div>
+            <div className="font-body-sm text-body-sm text-on-surface-variant">
+              Archived &amp; inspected in-person
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 p-space-md bg-surface-container-lowest/60 backdrop-blur-sm rounded-lg shadow-sm">
+            <div className="font-headline-lg text-headline-lg text-on-tertiary-container tracking-tight">
+              99.4%
+            </div>
+            <div className="font-label-caps text-label-caps text-secondary uppercase">
+              Verified Landlords
+            </div>
+            <div className="font-body-sm text-body-sm text-on-surface-variant">
+              Strict title &amp; escrow checks
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 p-space-md bg-surface-container-lowest/60 backdrop-blur-sm rounded-lg shadow-sm">
+            <div className="font-headline-lg text-headline-lg text-primary tracking-tight">
+              24hr
+            </div>
+            <div className="font-label-caps text-label-caps text-secondary uppercase">
+              Average Lease Approval
+            </div>
+            <div className="font-body-sm text-body-sm text-on-surface-variant">
+              Direct digital signature workflow
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 p-space-md bg-surface-container-lowest/60 backdrop-blur-sm rounded-lg shadow-sm">
+            <div className="font-headline-lg text-headline-lg text-primary tracking-tight">
+              ₦0
+            </div>
+            <div className="font-label-caps text-label-caps text-secondary uppercase">
+              Hidden Fees
+            </div>
+            <div className="font-body-sm text-body-sm text-on-surface-variant">
+              Zero application inflation
             </div>
           </div>
         </div>

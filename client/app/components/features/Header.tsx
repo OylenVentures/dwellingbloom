@@ -1,11 +1,12 @@
 "use client";
 import { NAV_LINKS } from "@/app/common/data";
 import { useAuthStore } from "@/app/store/useAuthStore";
-import { Home, LogIn, Menu, X } from "lucide-react";
+import { LogIn, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import LinkBtn from "../ui/Btn";
+import { LinkBtn } from "../ui/Btn";
+import { LightLogo } from "../ui/Logo";
 
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,27 +14,11 @@ function Header() {
   const activePage = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-border shadow-xs">
+    <header className="sticky top-0 z-40 bg-on-primary border-b border-border shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-16 flex items-center justify-between gap-3">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 cursor-pointer text-left focus:outline-hidden"
-          >
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-md shadow-primary/20">
-              <Home className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-lg font-extrabold text-primary tracking-tight">
-                Dwelling
-              </span>
-              <span className="text-lg font-extrabold text-accent tracking-tight">
-                Bloom
-              </span>
-            </div>
-          </Link>
+          <LightLogo />
 
-          {/* Desktop nav menu links */}
           <nav className="hidden md:flex items-center gap-6">
             {NAV_LINKS.map((link, idx) => (
               <Link
@@ -42,7 +27,7 @@ function Header() {
                 className={`text-sm font-semibold transition-colors ${
                   activePage === link.href
                     ? "text-primary"
-                    : "text-text-secondary hover:text-text-primary"
+                    : "text-on-secondary-container hover:text-primary"
                 }`}
               >
                 {link.name}
@@ -50,12 +35,11 @@ function Header() {
             ))}
           </nav>
 
-          {/* Desktop action buttons */}
           <div className="hidden md:flex items-center gap-3">
             {!user && (
               <LinkBtn
                 href="/auth/login"
-                styling="flex items-center gap-1.5 px-4 py-2 text-text-primary hover:text-primary font-bold text-xs rounded-xl transition-all cursor-pointer"
+                styling="flex items-center gap-1.5 px-4 py-2 text-primary hover:text-on-secondary-container font-bold text-xs rounded-xl transition-all cursor-pointer"
                 icon={<LogIn className="w-4 h-4" />}
                 text="Sign In"
               />
@@ -67,7 +51,7 @@ function Header() {
             onClick={() => setIsMobileMenuOpen((current) => !current)}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
-            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-xl border border-border text-text-primary hover:bg-background transition-colors cursor-pointer"
+            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-xl border border-border text-primary hover:bg-background transition-colors cursor-pointer"
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5" />
@@ -88,8 +72,8 @@ function Header() {
                     onClick={() => setIsMobileMenuOpen((current) => !current)}
                     className={`px-4 py-3 text-left text-sm font-semibold transition-colors ${
                       activePage === link.href
-                        ? "text-primary bg-background"
-                        : "text-text-primary hover:bg-background"
+                        ? "text-primary bg-on-primary"
+                        : "text-on-secondary-container hover:bg-on-primary"
                     }`}
                   >
                     {link.name}
@@ -102,7 +86,7 @@ function Header() {
                   <LinkBtn
                     href="/auth/login"
                     onClick={() => setIsMobileMenuOpen((current) => !current)}
-                    styling="w-full flex items-center justify-center gap-2 px-4 py-3 border border-border text-text-primary font-bold text-sm rounded-xl hover:bg-background transition-all cursor-pointer"
+                    styling="w-full flex items-center justify-center gap-2 px-4 py-3 border border-border text-primary font-bold text-sm rounded-xl hover:bg-on-secondary-container transition-all cursor-pointer"
                     icon={<LogIn className="w-4 h-4" />}
                     text="Sign In"
                   />

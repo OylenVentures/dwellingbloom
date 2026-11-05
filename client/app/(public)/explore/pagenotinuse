@@ -1,13 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRealEstateStore } from "../../store/useRealEstateStore";
 import ListingCard from "../../components/features/ListingCard";
 import { Search, Filter, ArrowLeft, ArrowRight } from "lucide-react";
-import LinkBtn from "@/app/components/ui/Btn";
+import { LinkBtn } from "@/app/components/ui/Btn";
 import Loading from "@/app/components/ui/Loading";
 
-export default function Property() {
-  const { listings, loading } = useRealEstateStore();
+function Explore() {
+  const { listings, isLoading, fetchListings } = useRealEstateStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -19,11 +19,11 @@ export default function Property() {
     listings?.length > 0 &&
     listings?.filter((listing) => {
       const matchesSearch =
-        listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.description.toLowerCase().includes(searchTerm.toLowerCase());
+        listing.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listing.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listing.apartment_type.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const price = listing.price;
+      const price = listing.monthly_rent;
       const matchesMinPrice = minPrice === "" || price >= Number(minPrice);
       const matchesMaxPrice = maxPrice === "" || price <= Number(maxPrice);
 
@@ -42,6 +42,10 @@ export default function Property() {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  useEffect(() => {
+    fetchListings();
+  }, [fetchListings]);
 
   return (
     <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col">
@@ -108,7 +112,7 @@ export default function Property() {
       </div>
 
       {/* Listings */}
-      {loading ? (
+      {isLoading ? (
         <Loading />
       ) : paginatedListings?.length === 0 ? (
         <div className="text-center py-20 bg-white border border-border rounded-2xl p-8 flex-1">
@@ -168,3 +172,5 @@ export default function Property() {
     </div>
   );
 }
+
+export default Explore;

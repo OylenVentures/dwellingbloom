@@ -1,5 +1,3 @@
-"use client";
-
 import { create } from "zustand";
 import {
   logout as logoutRequest,
@@ -13,7 +11,7 @@ interface AuthStore {
   user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
-  loading: boolean;
+  isLoading: boolean;
   error: string | null;
   setUser: (
     user: User | null,
@@ -31,7 +29,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   accessToken: null,
   refreshToken: null,
-  loading: false,
+  isLoading: false,
   error: null,
   setUser: (user, accessToken = null, refreshToken = null) => {
     set({ user, accessToken, refreshToken });

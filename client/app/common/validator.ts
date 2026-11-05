@@ -17,13 +17,35 @@ export const authSchema = yup.object({
     .required("Confirm password is required"),
   phone_number: yup.string().required("Phone number is required"),
   bvn: yup.string().required("BVN is required"),
-  account_number: yup.string().required("Account number is required"),
-  account_name: yup.string().required("Account name is required"),
-  bank_name: yup.string().required("Bank name is required"),
   role: yup
     .string()
     .oneOf(["TENANT", "OWNER"], "Invalid role")
     .required("Role is required"),
+  terms: yup
+    .boolean()
+    .oneOf([true], "You must accept the terms and conditions"),
+});
+
+export const searchConsoleSchema = yup.object().shape({
+  location: yup.string().required("Location or neighborhood is required"),
+  dwellingType: yup.string().required("Select a property type"),
+  maxBudget: yup.number().min(1000).max(6000).required(),
+  beds: yup.string().required(),
+});
+
+export const chatInputSchema = yup.object().shape({
+  message: yup.string().trim().min(1, "Cannot send empty message"),
+});
+
+export const exploreSearchSchema = yup.object().shape({
+  location: yup.string().required("Location is required"),
+  minPrice: yup.number().min(0).required(),
+  maxPrice: yup.number().max(10000).required(),
+  beds: yup.string().required(),
+  baths: yup.string().required(),
 });
 
 export type AuthFormData = yup.InferType<typeof authSchema>;
+export type SearchConsoleFormData = yup.InferType<typeof searchConsoleSchema>;
+export type ChatInputFormData = yup.InferType<typeof chatInputSchema>;
+export type ExploreSearchFormData = yup.InferType<typeof exploreSearchSchema>;

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Mail, Lock, Key, ArrowLeft, ArrowRight } from "lucide-react";
 import { confirmPasswordReset, requestPasswordReset } from "../../../api/auth";
 import { getErrorMessage } from "@/app/common/helper";
+import { FormBtn } from "@/app/components/ui/Btn";
 
 export default function PasswordResetPage() {
   const router = useRouter();
@@ -31,6 +32,7 @@ export default function PasswordResetPage() {
       toast.success("Reset link/code requested successfully");
       setStep("reset");
     } catch (error: unknown) {
+      console.log(error);
       toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
@@ -68,7 +70,7 @@ export default function PasswordResetPage() {
       <div className="max-w-md w-full bg-white border border-border p-8 rounded-3xl shadow-xl space-y-6">
         <button
           onClick={onBackToLogin}
-          className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary text-xs font-semibold transition-colors"
+          className="cursor-pointer inline-flex items-center gap-2 text-text-secondary hover:text-text-primary text-xs font-semibold transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Login</span>
@@ -103,14 +105,13 @@ export default function PasswordResetPage() {
                 </div>
               </div>
 
-              <button
+              <FormBtn
                 type="submit"
                 disabled={loading}
-                className="cursor-pointer w-full py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
-              >
-                <span>{loading ? "Sending..." : "Request Reset Code"}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+                styling="cursor-pointer w-full py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:bg-primary/50"
+                text={loading ? "Sending..." : "Request Reset Code"}
+                icon={<ArrowRight className="w-4 h-4" />}
+              />
             </form>
           </>
         ) : (
