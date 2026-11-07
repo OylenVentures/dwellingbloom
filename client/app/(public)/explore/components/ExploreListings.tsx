@@ -2,16 +2,24 @@
 import ListingCard from "@/app/components/features/ListingCard";
 import Loading from "@/app/components/ui/Loading";
 import { useRealEstateStore } from "@/app/store/useRealEstateStore";
-import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 
 export default function ExploreListings() {
-  const { listings, isLoading, fetchListings } = useRealEstateStore();
+  const {
+    listings,
+    isLoading,
+    fetchListings,
+    page,
+    page_size,
+    search,
+    setPage,
+  } = useRealEstateStore();
 
   useEffect(() => {
-    fetchListings();
-  }, [fetchListings]);
+    fetchListings(page, page_size, search);
+  }, [fetchListings, page, page_size, search]);
+
   return (
     <>
       {isLoading ? (
@@ -38,48 +46,27 @@ export default function ExploreListings() {
         <div className="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2">
           <span>Showing</span>
           <span className="font-numeric-data text-numeric-data text-primary font-bold">
-            1 – 6
+            {page_size * (page - 1) + 1} -{" "}
+            {Math.min(page_size * page, listings.length)}
           </span>
         </div>
+
         <div className="flex items-center gap-space-xs">
           <button
-            aria-label="Previous page"
-            disabled
-            className="p-2 text-outline-variant cursor-not-allowed rounded-lg"
             type="button"
+            disabled={page === 1}
+            aria-label="Previous page"
+            className="cursor-pointer p-2 bg-primary text-on-primary hover:bg-primary/80 rounded-lg disabled:cursor-not-allowed disabled:bg-surface-container-low disabled:text-on-surface-variant transition-colors"
+            onClick={() => setPage(page - 1)}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
+
           <button
-            className="cursor-pointer w-9 h-9 rounded-lg bg-primary text-on-primary font-numeric-data text-numeric-data font-semibold"
             type="button"
-          >
-            1
-          </button>
-          <button
-            className="cursor-pointer w-9 h-9 rounded-lg hover:bg-surface-container-high text-primary font-numeric-data transition-colors"
-            type="button"
-          >
-            2
-          </button>
-          <button
-            className="cursor-pointer w-9 h-9 rounded-lg hover:bg-surface-container-high text-primary font-numeric-data transition-colors"
-            type="button"
-          >
-            3
-          </button>
-          <span className="px-1 text-secondary font-numeric-data">…</span>
-          <button
-            className="cursor-pointer w-9 h-9 rounded-lg hover:bg-surface-container-high text-primary font-numeric-data transition-colors"
-            type="button"
-          >
-            24
-          </button>
-          <button
             aria-label="Next page"
-            onClick={() => toast.success("Loaded page 2")}
-            className="p-2 text-secondary hover:text-primary rounded-lg transition-colors cursor-pointer"
-            type="button"
+            onClick={() => setPage(page + 1)}
+            className="cursor-pointer p-2 bg-primary text-on-primary hover:bg-primary/80 rounded-lg transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

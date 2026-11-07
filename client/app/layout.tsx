@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import Header from "./components/features/Header";
-import Footer from "./components/features/Footer";
 
 export const metadata: Metadata = {
   title: "DwellingBloom",
@@ -26,10 +24,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-surface text-on-surface font-body-md">
+        {children}
         <Toaster position="top-right" reverseOrder={false} />
-        <Header />
-        <div className="flex-1 flex flex-col">{children}</div>
-        <Footer />
       </body>
     </html>
   );

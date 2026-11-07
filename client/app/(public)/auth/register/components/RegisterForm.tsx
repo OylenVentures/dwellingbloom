@@ -16,23 +16,25 @@ import {
   Loader2,
   ShieldCheck,
 } from "lucide-react";
-import { useAuthStore } from "@/app/store/useAuthStore";
-import { AuthFormData, authSchema } from "@/app/common/validator";
+import { registerSchema, RegisterFormData } from "@/app/common/validator";
+import { signup, SignupResponse } from "@/app/api/auth";
+import { useRouter } from "next/navigation";
+import { getErrorMessage } from "@/app/common/helper";
 import { FormBtn, LinkBtn } from "@/app/components/ui/Btn";
 
 export function RegisterForm() {
+  const router = useRouter();
   const [role, setRole] = useState<"TENANT" | "OWNER">("TENANT");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const { setUser } = useAuthStore();
 
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<AuthFormData>({
-    resolver: yupResolver(authSchema),
+  } = useForm<RegisterFormData>({
+    resolver: yupResolver(registerSchema),
     defaultValues: { role: "TENANT" },
   });
 
@@ -51,34 +53,17 @@ export function RegisterForm() {
     setPasswordStrength(score);
   };
 
-  const onSubmit = async (data: AuthFormData) => {
-    const toastId = toast.loading("Encrypting & Provisioning account...");
-
+  const onSubmit = async (data: RegisterFormData) => {
     try {
-      // Simulate API registration request & sync with Zustand store
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
-      setUser(
-        {
-          id: "user_" + Date.now(),
-          email: data.email,
-          name: `${data.firstName} ${data.lastName}`,
-          role: data.role,
-        },
-        "mock_access_token_" + Date.now(),
-        "mock_refresh_token_" + Date.now(),
-      );
-
+      const resData = await signup(data);
+      const signupData = resData as SignupResponse;
       toast.success(
-        "Account successfully registered! Welcome to DwellingBloom.",
-        {
-          id: toastId,
-        },
+        signupData.message ||
+          "Registration successful! Please verify your email.",
       );
-    } catch {
-      toast.error("Registration failed. Please check your credentials.", {
-        id: toastId,
-      });
+      router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -161,7 +146,7 @@ export function RegisterForm() {
             </label>
             <input
               id="first_name"
-              {...register("first_name")}
+              {...register("first_name", { required: "Required" })}
               className="w-full bg-surface-container-low px-4 py-3 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-inner"
               placeholder="Eleanor"
             />
@@ -180,7 +165,7 @@ export function RegisterForm() {
             </label>
             <input
               id="last_name"
-              {...register("last_name")}
+              {...register("last_name", { required: "Required" })}
               className="w-full bg-surface-container-low px-4 py-3 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-inner"
               placeholder="Vance"
             />
@@ -201,7 +186,7 @@ export function RegisterForm() {
               <Mail className="absolute left-3.5 w-4 h-4 text-outline pointer-events-none" />
               <input
                 id="email"
-                {...register("email")}
+                {...register("email", { required: "Required" })}
                 type="email"
                 className="w-full bg-surface-container-low pl-10 pr-4 py-3 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-inner"
                 placeholder="eleanor.vance@studio.com"
@@ -219,7 +204,7 @@ export function RegisterForm() {
               <Phone className="absolute left-3.5 w-4 h-4 text-outline pointer-events-none" />
               <input
                 id="phone"
-                {...register("phone_number")}
+                {...register("phone_number", { required: "Required" })}
                 type="tel"
                 className="w-full bg-surface-container-low pl-10 pr-4 py-3 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-inner"
                 placeholder="+1 (555) 392-8172"
@@ -240,7 +225,7 @@ export function RegisterForm() {
           <div className="relative flex items-center">
             <Lock className="absolute left-3.5 w-4 h-4 text-outline pointer-events-none" />
             <input
-              {...register("password")}
+              {...register("password", { required: "Required" })}
               type={showPassword ? "text" : "password"}
               onChange={(e) => {
                 register("password").onChange(e);
@@ -310,7 +295,7 @@ export function RegisterForm() {
             <Lock className="absolute left-3.5 w-4 h-4 text-outline pointer-events-none" />
             <input
               id="confirm_password"
-              {...register("confirm_password")}
+              {...register("confirm_password", { required: "Required" })}
               type={showPassword ? "text" : "password"}
               onChange={(e) => {
                 register("confirm_password").onChange(e);
@@ -398,7 +383,7 @@ export function RegisterForm() {
           <div className="flex items-start space-x-3 pt-1">
             <input
               id="terms-check"
-              {...register("terms")}
+              {...register("terms", { required: "Required" })}
               type="checkbox"
               className="mt-1 h-4 w-4 rounded text-primary focus:ring-primary/30 accent-primary cursor-pointer"
             />

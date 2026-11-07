@@ -2,28 +2,39 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Send, Lock, CheckCheck } from "lucide-react";
-import { useListingStore } from "@/app/store/useListingStore";
 import { ChatInputFormData, chatInputSchema } from "@/app/common/validator";
 import Image from "next/image";
+import { useState } from "react";
+
+interface Message {
+  id: string;
+  sender: string;
+  role: "renter" | "owner";
+  text: string;
+  timestamp: string;
+}
 
 export const ChatWidget = () => {
-  const { messages, addMessage } = useListingStore();
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const { register, handleSubmit, reset } = useForm<ChatInputFormData>({
     resolver: yupResolver(chatInputSchema),
   });
 
   const onSubmit = (data: ChatInputFormData) => {
-    addMessage({
-      id: Date.now().toString(),
-      sender: "You",
-      role: "renter",
-      text: data.message,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    });
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        id: Date.now().toString(),
+        sender: "You",
+        role: "renter",
+        text: data.message ?? "",
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+    ]);
     reset();
   };
 

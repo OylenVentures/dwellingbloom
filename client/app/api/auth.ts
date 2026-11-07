@@ -1,6 +1,7 @@
 import { apiRequest } from "./client";
 
 export interface AuthUser {
+  data: AuthUser | null;
   id: string;
   first_name: string;
   last_name: string;

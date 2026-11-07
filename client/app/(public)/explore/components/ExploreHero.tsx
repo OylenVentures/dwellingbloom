@@ -3,7 +3,7 @@ import { useRealEstateStore } from "@/app/store/useRealEstateStore";
 import { MapPin, X } from "lucide-react";
 
 export default function ExploreHero() {
-  const { filters, setFilters } = useRealEstateStore();
+  const { search, setSearch } = useRealEstateStore();
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg mb-space-xl">
@@ -33,15 +33,15 @@ export default function ExploreHero() {
           <input
             id="location"
             type="text"
-            value={filters}
-            onChange={(e) => setFilters(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent border-none outline-none font-body-md text-body-md text-on-surface p-0 placeholder-secondary"
             placeholder="Search by city"
           />
         </div>
         <button
           type="button"
-          onClick={() => setFilters("")}
+          onClick={() => setSearch("")}
           aria-label="Clear location"
           className="cursor-pointer text-secondary hover:text-primary transition-colors p-1"
         >

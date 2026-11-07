@@ -2,6 +2,7 @@ import { apiRequest } from "./client";
 
 export interface Apartment {
   id: string;
+  images: { image: string }[];
   title: string;
   name: string;
   apartment_type: string;
@@ -25,6 +26,10 @@ export interface Apartment {
   ownerEmail: string;
   ownerPhone: string;
   createdAt: string;
+}
+
+export interface ApartmentListResponse {
+  data: Apartment[];
 }
 
 // export interface ApartmentPayload {
@@ -55,8 +60,23 @@ function apartmentPath(path: string) {
   return `/apartments${path}`;
 }
 
-export function listApartments() {
-  return apiRequest<Apartment[]>(apartmentPath(""));
+export function listApartments({
+  page,
+  page_size,
+  search,
+}: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+}) {
+  const params = new URLSearchParams();
+  if (page) params.set("page", page.toString());
+  if (page_size) params.set("page_size", page_size.toString());
+  if (search) params.set("search", search);
+
+  return apiRequest<ApartmentListResponse>(
+    apartmentPath(`?${params.toString()}`),
+  );
 }
 
 export function createApartment(payload: FormData) {

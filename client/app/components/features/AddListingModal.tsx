@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -30,8 +29,7 @@ function getErrorMessage(error: unknown) {
 }
 
 export default function AddListingModal({ onClose }: ListingFormProps) {
-  const addListing = useRealEstateStore((state) => state.addListing);
-  const loading = useRealEstateStore((state) => state.loading);
+  const { isLoading, addListing } = useRealEstateStore();
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
@@ -92,16 +90,9 @@ export default function AddListingModal({ onClose }: ListingFormProps) {
     });
 
     try {
-      const success = await addListing(payload);
-      toast.success("Apartment listing created successfully!", {
-        icon: "🏠",
-        style: {
-          border: "1px solid #22C55E",
-          padding: "16px",
-          color: "#1F2937",
-        },
-      });
-      // reset();
+      await addListing(payload);
+      toast.success("Apartment listing created successfully!");
+      reset();
       // setImageFiles([]);
       // setVideoFile(null);
       // setDocumentFile(null);
@@ -385,10 +376,10 @@ export default function AddListingModal({ onClose }: ListingFormProps) {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading}
               className="cursor-pointer px-5 py-2.5 text-sm font-medium text-white bg-primary hover:bg-secondary rounded-lg transition-colors shadow-xs disabled:opacity-50"
             >
-              {loading ? "Creating..." : "Submit Listing"}
+              {isLoading ? "Creating..." : "Submit Listing"}
             </button>
           </div>
         </form>

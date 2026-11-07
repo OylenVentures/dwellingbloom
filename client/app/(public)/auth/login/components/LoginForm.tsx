@@ -13,11 +13,16 @@ import {
   Loader2,
 } from "lucide-react";
 import { useAuthStore } from "@/app/store/useAuthStore";
-import { AuthFormData, authSchema } from "@/app/common/validator";
+import { loginSchema, LoginFormData } from "@/app/common/validator";
 import { FormBtn, LinkBtn } from "@/app/components/ui/Btn";
 import { LightLogo } from "@/app/components/ui/Logo";
+import { login, LoginResponse } from "@/app/api/auth";
+import { getCurrentUser } from "@/app/api/user";
+import { useRouter } from "next/navigation";
+import { getErrorMessage } from "@/app/common/helper";
 
 export function LoginForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useAuthStore();
 
@@ -25,29 +30,25 @@ export function LoginForm() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<Partial<AuthFormData>>({
-    resolver: yupResolver(authSchema),
+  } = useForm<LoginFormData>({
+    resolver: yupResolver(loginSchema),
   });
 
-  const onSubmit = async (data: Partial<AuthFormData>) => {
-    const toastId = toast.loading("Verifying Authenticity...");
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      // Simulated API Authentication Call
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
-      const mockUser = {
-        id: "usr_892374",
-        email: data.email,
-        name: "Alexandra Vane",
-      };
-
-      setUser(mockUser, "mock_access_token_123", "mock_refresh_token_456");
-
-      toast.success("Authenticated! Redirecting to Portal...");
-    } catch {
-      toast.error("Authentication failed. Please check your credentials.", {
-        id: toastId,
-      });
+      const resData = await login(data);
+      const loginData = resData as LoginResponse;
+      const currentUser = await getCurrentUser(loginData.access_token);
+      localStorage.setItem("token", loginData.access_token);
+      setUser(
+        currentUser.data,
+        loginData.access_token,
+        loginData.refresh_token,
+      );
+      toast.success(loginData.message || "Login successful.", { icon: "👋" });
+      // router.push("/dashboard");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -90,7 +91,7 @@ export function LoginForm() {
                 id="email"
                 type="email"
                 autoComplete="email"
-                {...register("email", { required: "Email is required" })}
+                {...register("email", { required: "Required" })}
                 placeholder="alexandra.vane@architecture.org"
                 className="w-full pl-11 pr-4 py-3 bg-surface-container-low text-on-surface font-body-md text-body-md rounded placeholder:text-outline focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container shadow-inner transition-colors"
               />
@@ -114,7 +115,7 @@ export function LoginForm() {
                 id="password"
                 autoComplete="current-password"
                 type={showPassword ? "text" : "password"}
-                {...register("password", { required: "Password is required" })}
+                {...register("password", { required: "Required" })}
                 placeholder="••••••••••••"
                 className="w-full pl-11 pr-12 py-3 bg-surface-container-low text-on-surface font-body-md text-body-md rounded placeholder:text-outline focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container shadow-inner transition-colors"
               />

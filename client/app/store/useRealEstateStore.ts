@@ -9,11 +9,18 @@ export type Listing = Apartment;
 
 interface RealEstateStore {
   listings: Listing[];
-  filters: string;
+  page: number;
+  page_size: number;
+  search: string;
   isLoading: boolean;
   error: string | null;
-  setFilters: (filters: string) => void;
-  fetchListings: () => Promise<void>;
+  setPage: (page: number) => void;
+  setSearch: (search: string) => void;
+  fetchListings: (
+    page?: number,
+    page_size?: number,
+    search?: string,
+  ) => Promise<void>;
   addListing: (listing: FormData) => Promise<Listing | null>;
 }
 
@@ -23,15 +30,18 @@ function getErrorMessage(error: unknown) {
 
 export const useRealEstateStore = create<RealEstateStore>((set) => ({
   listings: [],
-  filters: "",
+  page: 1,
+  page_size: 18,
+  search: "",
   isLoading: false,
   error: null,
-  setFilters: (newFilters) => set({ filters: newFilters }),
-  fetchListings: async () => {
+  setPage: (page) => set({ page }),
+  setSearch: (search) => set({ search }),
+  fetchListings: async (page, page_size, search) => {
     set({ isLoading: true, error: null });
     try {
-      const resp = await listApartments();
-      set({ listings: resp.data, isLoading: false });
+      const resp = await listApartments({ page, page_size, search });
+      set({ listings: resp?.data, isLoading: false });
     } catch (error: unknown) {
       set({ error: getErrorMessage(error), isLoading: false });
     }

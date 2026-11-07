@@ -20,7 +20,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
     <div className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
       <div className="relative aspect-16/10 overflow-hidden bg-surface-container">
         <Image
-          src={listing.images[0].image}
+          src={listing?.images[0].image}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           width={600}
           height={300}
